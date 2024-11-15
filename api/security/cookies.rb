@@ -1,7 +1,7 @@
 require 'jwt'
 
 class Cookies
-    SERVER_SECRET = 'jwt_secret'
+    SERVER_SECRET = 'KiGenNmr1'
     def initialize() end
 
     def create_cookie(payload)
