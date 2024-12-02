@@ -20,10 +20,15 @@ class Seeder
                 password TEXT NOT NULL,
                 last_login DATETIME,
                 cookie TEXT)')
+    db.execute('CREATE TABLE Licenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                owner INTEGER NOT NULL,
+                license TEXT NOT NULL,
+                expiration DATETIME)')
   end
 
   def self.populate_tables
-    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("https.kiko@gmail.com", "pinkflamingo", "hashed_passwd", CURRENT_TIMESTAMP)')
+    #db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("https.kiko@gmail.com", "pinkflamingo", "hashed_passwd", CURRENT_TIMESTAMP)')
   end
 
   private

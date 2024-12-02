@@ -8,10 +8,13 @@ class App < Sinatra::Base
         acc = Accounts.new
 
         # Skapa konto
-        p acc.create("test@gmail.com", "username", "password")
+        #print("Create account: #{acc.create("https.kiko@gmail.com", "unknownfrome", "password")}\n")
 
         # Logga in i konto
-        p acc.authenticate("test@gmail.com", "password")
+        #print("Auth: #{acc.authenticate("https.kiko@gmail.com", "password")}\n")
+
+        acc.auth_token("eyJleHAiOjE3MzMxNDQzNTMsInN1YiI6IktpR2VuIiwiYWxnIjoiSFMyNTYifQ.ImE1MzdmYzQ4MWM4N2ZlYzYzNTJjN2Y1MzgyYjUwNGE3ZDkwZmFiNWNmNWM2MDYwMGUzMTA2NTEzOTY1NzViZWMi._lJPBcRy8PyiWKYclQhMLq0QBz4TGgt-4eXAhYbTew4")
+
         erb(:"index")
     end
 end

@@ -23,26 +23,42 @@ class Accounts
         username_exists = db.execute('SELECT 1 FROM Authentication WHERE username = ?', [username]).any?
       
         if email_exists
-          return Status[:EMAIL_EXISTS]
+          return :EMAIL_EXISTS
         elsif username_exists
-            return Status[:USERNAME_EXISTS]
+            return :USERNAME_EXISTS
         else
           hashed_password = sha.hash_str(password)
           db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', [email, username, hashed_password])
       
-          return Status[:SUCCESS]
+          return :SUCCESS
         end
     end      
-
+    def auth_token(token)
+        token_exists = db.execute('SELECT 1 FROM Authentication WHERE cookie = ?', [token]).any?
+        if token_exists then
+            print("token_exists = #{token_exists}\n")
+            payload = @cookies.decode_cookie(token)
+            stauts = @cookies.check_expiration(payload)
+            print("Cookie is: #{stauts}\n")
+            if stauts == :EXPIRED || status == :INVALID then
+                db.execute('UPDATE Authentication SET cookie = NULL WHERE cookie = ?', [token])
+                print("Cookie has been set to NULL for expired token.\n")
+                return :EXPIRED
+            end
+            return :VALID
+        else
+            return :INVALID
+        end
+    end
     def authenticate(email, password)
         hashed_password = sha.hash_str(password)
         jwt_token = @cookies.create_cookie(@sha.hash_str(email))
         db.execute('UPDATE Authentication SET cookie = ?, last_login = CURRENT_TIMESTAMP WHERE email = ? AND password = ?', [jwt_token, email, hashed_password])
         rows_affected = db.changes 
         if rows_affected > 0 then
-            return Status[:SUCCESS], jwt_token
+            return :SUCCESS, jwt_token
         else
-            return Status[:FAILED], "FAILED TO AUTHENTICATE."
+            return :FAILED, "FAILED TO AUTHENTICATE."
         end
     end
 end
