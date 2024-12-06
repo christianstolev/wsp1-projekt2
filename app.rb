@@ -8,12 +8,18 @@ class App < Sinatra::Base
         acc = Accounts.new
 
         # Skapa konto
-        #print("Create account: #{acc.create("https.kiko@gmail.com", "unknownfrome", "password")}\n")
+        # Kan returnera följande: :EMAIL_EXISTS, :USERNAME_EXISTS, :SUCCESS
+        acc.create("https.kiko@gmail.com", "unknownfrome", "password")
 
         # Logga in i konto
-        #print("Auth: #{acc.authenticate("https.kiko@gmail.com", "password")}\n")
-
-        acc.auth_token("eyJleHAiOjE3MzMxNDQzNTMsInN1YiI6IktpR2VuIiwiYWxnIjoiSFMyNTYifQ.ImE1MzdmYzQ4MWM4N2ZlYzYzNTJjN2Y1MzgyYjUwNGE3ZDkwZmFiNWNmNWM2MDYwMGUzMTA2NTEzOTY1NzViZWMi._lJPBcRy8PyiWKYclQhMLq0QBz4TGgt-4eXAhYbTew4")
+        status, cookie = acc.authenticate("https.kiko@gmail.com", "password")
+        if status == :SUCCESS then
+            p "Signed in!"
+            acc.auth_token(cookie) # Returnerar :SUCCESS, :EXPIRED eller :FAILED 
+        else
+            p "Failed to login!"
+        end
+        
 
         erb(:"index")
     end
