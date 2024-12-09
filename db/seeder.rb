@@ -10,6 +10,7 @@ class Seeder
 
   def self.drop_tables
     db.execute('DROP TABLE IF EXISTS Authentication')
+    db.execute('DROP TABLE IF EXISTS Licenses')
   end
 
   def self.create_tables
@@ -24,6 +25,7 @@ class Seeder
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 owner INTEGER NOT NULL,
                 license TEXT NOT NULL,
+                product TEXT NOT NULL,
                 expiration DATETIME)')
   end
 

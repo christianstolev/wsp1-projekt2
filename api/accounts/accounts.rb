@@ -38,9 +38,9 @@ class Accounts
         if token_exists then
             print("token_exists = #{token_exists}\n")
             payload = @cookies.decode_cookie(token)
-            stauts = @cookies.check_expiration(payload)
-            print("Cookie is: #{stauts}\n")
-            if stauts == :EXPIRED || status == :INVALID then
+            status = @cookies.check_expiration(payload)
+            print("Cookie is: #{status}\n")
+            if status == :EXPIRED || status == :INVALID then
                 db.execute('UPDATE Authentication SET cookie = NULL WHERE cookie = ?', [token])
                 print("Cookie has been set to NULL for expired token.\n")
                 return :EXPIRED

@@ -25,6 +25,7 @@ class Cookies
         payload = decrypted_payload
         if payload['exp'] then 
             expiration_time = Time.at(payload['exp'])
+            
             if expiration_time < Time.now
                 return :EXPIRED
             else

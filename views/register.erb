@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <title>Modern Dark Login</title>
+    <title>Register - Dark Theme</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -16,7 +16,7 @@
             justify-content: center;
             color: #ffffff;
         }
-        .login-container {
+        .register-container {
             background: rgba(0, 0, 0, 0.4);
             padding: 2rem;
             border-radius: 10px;
@@ -85,9 +85,13 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Welcome Back</h2>
-        <form id="loginForm">
+    <div class="register-container">
+        <h2>Create an Account</h2>
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
             <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
@@ -96,16 +100,16 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Sign In</button>
+            <button type="submit">Register</button>
             <div class="error" id="error"></div>
         </form>
         <div class="links">
-            <a href="#" id="registerLink">Register</a>
+            <a href="index.html">Already have an account? Sign In</a>
         </div>
     </div>
 
     <script>
-    $.extend(
+        $.extend(
 {
     redirectPost: function(location, args)
     {
@@ -117,29 +121,47 @@
         $('<form action="' + location + '" method="POST">' + form + '</form>').appendTo($(document.body)).submit();
     }
 });
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            var email = document.getElementById('email').value;
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
             var error = document.getElementById('error');
 
-            if (username.trim() === '' || password.trim() === '') {
-                error.textContent = 'Please enter both username and password.';
-            } else {
-                error.textContent = '';
-                // Here you would typically send the login data to a server
-                console.log('Login attempt:', { username, password });
-                alert('Login functionality would be implemented here.');
-                $.redirectPost("http://localhost:9292/login", {email: username, password: password});
+            // Basic form validation
+            if (email.trim() === '' || username.trim() === '' || password.trim() === '') {
+                error.textContent = 'Please fill in all fields.';
+                return;
             }
+
+            if (!isValidEmail(email)) {
+                error.textContent = 'Please enter a valid email address.';
+                return;
+            }
+
+            if (password.length < 8) {
+                error.textContent = 'Password must be at least 8 characters long.';
+                return;
+            }
+
+            // If all validations pass, you would typically send the registration data to a server
+            error.textContent = '';
+            console.log('Registration attempt:', { email, username, password });
+            alert('Registration successful! (In a real app, this data would be sent to a server)');
+            // Redirect to login page or dashboard after successful registration
+            // window.location.href = 'index.html';
+            $.redirectPost("http://localhost:9292/register", {
+                email: email,
+                username: username, 
+                password: password
+            });
         });
 
-        document.getElementById('registerLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Registration page would be implemented here.');
-            window.location.href = '/?register=1'
-        });
+        function isValidEmail(email) {
+            // Basic email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
     </script>
 </body>
 </html>
