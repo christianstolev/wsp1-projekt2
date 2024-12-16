@@ -1,180 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            margin: 0;
-            padding: 20px;
-            color: #ffffff;
-        }
-        .dashboard-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.6);
-        }
-        h1 {
-            color: #4ecca3;
-            margin-bottom: 1rem;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .logout-btn {
-            background: #ff6b6b;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .logout-btn:hover {
-            background: #ff5252;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        th {
-            background-color: rgba(78, 204, 163, 0.2);
-            color: #4ecca3;
-        }
-        .generate-keys {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            border-radius: 5px;
-        }
-        .generate-keys h2 {
-            color: #4ecca3;
-            margin-top: 0;
-        }
-        .generate-keys label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        .generate-keys input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            color: #ffffff;
-        }
-        .generate-btn {
-            background: #4ecca3;
-            color: #1a1a2e;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .generate-btn:hover {
-            background: #45b393;
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="header">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>User Dashboard</title>
+      <style>
+         body {
+         font-family: 'Arial', sans-serif;
+         background: linear-gradient(135deg, #1a1a2e, #16213e);
+         margin: 0;
+         padding: 20px;
+         color: #ffffff;
+         }
+         .dashboard-container {
+         max-width: 1000px;
+         margin: 0 auto;
+         background: rgba(0, 0, 0, 0.4);
+         padding: 2rem;
+         border-radius: 10px;
+         backdrop-filter: blur(10px);
+         box-shadow: 0 15px 25px rgba(0,0,0,0.6);
+         }
+         h1 {
+         color: #4ecca3;
+         margin-bottom: 1rem;
+         }
+         .header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 2rem;
+         }
+         .logout-btn {
+         background: #ff6b6b;
+         color: #ffffff;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         transition: background 0.3s ease;
+         }
+         .logout-btn:hover {
+         background: #ff5252;
+         }
+         table {
+         width: 100%;
+         border-collapse: collapse;
+         margin-bottom: 2rem;
+         }
+         th, td {
+         padding: 12px;
+         text-align: left;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         }
+         th {
+         background-color: rgba(78, 204, 163, 0.2);
+         color: #4ecca3;
+         }
+         .generate-keys {
+         background: rgba(255, 255, 255, 0.1);
+         padding: 1rem;
+         border-radius: 5px;
+         }
+         .generate-keys h2 {
+         color: #4ecca3;
+         margin-top: 0;
+         }
+         .generate-keys label {
+         display: block;
+         margin-bottom: 0.5rem;
+         }
+         .generate-keys input {
+         width: 100%;
+         padding: 8px;
+         margin-bottom: 1rem;
+         background: rgba(255, 255, 255, 0.1);
+         border: 1px solid rgba(255, 255, 255, 0.3);
+         border-radius: 4px;
+         color: #ffffff;
+         }
+         .generate-btn {
+         background: #4ecca3;
+         color: #1a1a2e;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         transition: background 0.3s ease;
+         }
+         .generate-btn:hover {
+         background: #45b393;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="dashboard-container">
+         <div class="header">
             <h1>License Key Dashboard</h1>
             <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-        
-        <table id="licenseTable">
+         </div>
+         <table id="licenseTable">
             <thead>
-                <tr>
-                    <th>License Key</th>
-                    <th>Product</th>
-                    <th>Expiration Time</th>
-                </tr>
+               <tr>
+                  <th>License Key</th>
+                  <th>Product</th>
+                  <th>Expiration Time</th>
+                  <th>Action</th>
+               </tr>
             </thead>
             <tbody>
-                <!-- Sample data, replace with dynamic data in a real application -->
-                <tr>
-                    <td>ABCD-EFGH-IJKL-MNOP</td>
-                    <td>Product A</td>
-                    <td>2023-12-31</td>
-                </tr>
-                <tr>
-                    <td>QRST-UVWX-YZAB-CDEF</td>
-                    <td>Product B</td>
-                    <td>2024-06-30</td>
-                </tr>
+               <!-- Sample data, replace with dynamic data in a real application -->
+               <% if @licenses && @licenses.any? %>
+               <% @licenses.each do |license| %>
+               <tr>
+                  <td><%= license["license"] %></td>
+                  <td><%= license["product"] %></td>
+                  <td><%= license["expiration"] %></td>
+                  <td><a href="/action/delete/<%= license["id"] %>">Delete</a>
+                  <td>
+               </tr>
+               <% end %>
+               <% else %>
+               <tr>
+                  <td colspan="3">No licenses found.</td>
+               </tr>
+               <% end %>
             </tbody>
-        </table>
-
-        <div class="generate-keys">
+         </table>
+         <div class="generate-keys">
             <h2>Generate License Keys</h2>
-            <form id="generateForm">
-                <label for="product">Product:</label>
-                <input type="text" id="product" required>
-                
-                <label for="amount">Number of Keys:</label>
-                <input type="number" id="amount" min="1" max="100" required>
-                
-                <button type="submit" class="generate-btn">Generate Keys</button>
+            <form id="generateForm" onsubmit="redirectToGeneratePage(event)">
+               <label for="product">Product:</label>
+               <input type="text" id="product" required>
+               <label for="amount">Number of Keys:</label>
+               <input type="number" id="amount" min="1" max="100" required>
+               <button type="submit" class="generate-btn">Generate Keys</button>
             </form>
-        </div>
-    </div>
+            <script>
+               function redirectToGeneratePage(event) {
+                   event.preventDefault();
+                   const amount = document.getElementById('amount').value;
+                   const product = document.getElementById('product').value;
+                   window.location.href = `/action/generate/${amount}/${product}`;
+               }
+            </script>
+         </div>
 
-    <script>
-        function logout() {
-            // In a real application, you would handle the logout process here
-            // For this example, we'll just redirect to the logout page
-            window.location.href = '/logout';
-        }
-
-        document.getElementById('generateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const product = document.getElementById('product').value;
-            const amount = document.getElementById('amount').value;
-
-            // In a real application, you would send this data to the server
-            // and receive newly generated license keys in response
-            // For this example, we'll just log the request and show an alert
-            console.log(`Generating ${amount} license keys for ${product}`);
-            alert(`${amount} license keys for ${product} would be generated here.`);
-
-            // Here you would typically update the table with the new keys
-            // For this example, we'll add a dummy row to the table
-            const table = document.getElementById('licenseTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-                <td>${generateDummyLicenseKey()}</td>
-                <td>${product}</td>
-                <td>${generateDummyExpirationDate()}</td>
-            `;
-        });
-
-        function generateDummyLicenseKey() {
-            return 'XXXX-XXXX-XXXX-XXXX'.replace(/X/g, () => Math.floor(Math.random() * 16).toString(16).toUpperCase());
-        }
-
-        function generateDummyExpirationDate() {
-            const date = new Date();
-            date.setFullYear(date.getFullYear() + 1);
-            return date.toISOString().split('T')[0];
-        }
-    </script>
-</body>
+         <div class="generate-keys">
+            <h2>Change password</h2>
+            <form id="changePassForm" onsubmit="redirect_changepass(event)">
+               <label for="new_pass">New password:</label>
+               <input type="password" id="new_pass" required>
+               
+               <button type="submit" class="generate-btn">Change Password</button>
+            </form>
+            <script>
+               function redirect_changepass(event) {
+                   event.preventDefault();
+                   const password = document.getElementById('new_pass').value;
+                   
+                   window.location.href = `/action/change/` + password;
+               }
+            </script>
+         </div>
+      </div>
+      <script>
+         function logout() {
+             // In a real application, you would handle the logout process here
+             // For this example, we'll just redirect to the logout page
+             window.location.href = '/logout';
+         }
+         
+         document.getElementById('generateForm').addEventListener('submit', function(e) {
+             e.preventDefault();
+             const product = document.getElementById('product').value;
+             const amount = document.getElementById('amount').value;
+         
+             // In a real application, you would send this data to the server
+             // and receive newly generated license keys in response
+             // For this example, we'll just log the request and show an alert
+             console.log(`Generating ${amount} license keys for ${product}`);
+             //alert(`${amount} license keys for ${product} would be generated here.`);
+         
+             // Here you would typically update the table with the new keys
+             // For this example, we'll add a dummy row to the table
+             const table = document.getElementById('licenseTable').getElementsByTagName('tbody')[0];
+             const newRow = table.insertRow();
+             newRow.innerHTML = `
+                 <td>${generateDummyLicenseKey()}</td>
+                 <td>${product}</td>
+                 <td>${generateDummyExpirationDate()}</td>
+             `;
+         });
+         
+         function generateDummyLicenseKey() {
+             return 'XXXX-XXXX-XXXX-XXXX'.replace(/X/g, () => Math.floor(Math.random() * 16).toString(16).toUpperCase());
+         }
+         
+         function generateDummyExpirationDate() {
+             const date = new Date();
+             date.setFullYear(date.getFullYear() + 1);
+             return date.toISOString().split('T')[0];
+         }
+      </script>
+   </body>
 </html>

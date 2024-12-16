@@ -130,14 +130,14 @@
                 error.textContent = '';
                 // Here you would typically send the login data to a server
                 console.log('Login attempt:', { username, password });
-                alert('Login functionality would be implemented here.');
+                //alert('Login functionality would be implemented here.');
                 $.redirectPost("http://localhost:9292/login", {email: username, password: password});
             }
         });
 
         document.getElementById('registerLink').addEventListener('click', function(e) {
             e.preventDefault();
-            alert('Registration page would be implemented here.');
+            //alert('Registration page would be implemented here.');
             window.location.href = '/?register=1'
         });
     </script>

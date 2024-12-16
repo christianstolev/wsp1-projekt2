@@ -104,7 +104,7 @@
             <div class="error" id="error"></div>
         </form>
         <div class="links">
-            <a href="index.html">Already have an account? Sign In</a>
+            <a href="/">Already have an account? Sign In</a>
         </div>
     </div>
 
@@ -147,7 +147,7 @@
             // If all validations pass, you would typically send the registration data to a server
             error.textContent = '';
             console.log('Registration attempt:', { email, username, password });
-            alert('Registration successful! (In a real app, this data would be sent to a server)');
+            //alert('Registration successful! (In a real app, this data would be sent to a server)');
             // Redirect to login page or dashboard after successful registration
             // window.location.href = 'index.html';
             $.redirectPost("http://localhost:9292/register", {
