@@ -62,15 +62,27 @@ class Licenses
   # @param [String] product The product name for which to generate licenses.
   # @param [Integer] amount The number of licenses to generate.
   # @return [Array<Hash>] A list of generated licenses with product and expiration details.
-  def generate_licenses(product, amount)
+  def generate_licenses(product, amount, expiration_date)
     return nil unless @user_id
 
     values = []
     generated_licenses = []
-    expiration_date = (Time.now + (365 * 24 * 60 * 60)).strftime('%Y-%m-%d')
+    if not expiration_date then
+      expiration_date = (Time.now + (365 * 24 * 60 * 60)).strftime('%Y-%m-%d')
+    end
+    #expiration_date = (Time.now + (365 * 24 * 60 * 60)).strftime('%Y-%m-%d')
 
+    def generate_license_key
+      characters = [('0'..'9'), ('A'..'F')].map(&:to_a).flatten
+      key = ''
+      4.times do
+        key += (0...4).map { characters[rand(characters.length)] }.join
+        key += '-' unless key.length >= 19
+      end
+      key
+    end
     amount.times do
-      license_key = SecureRandom.hex(10)
+      license_key = generate_license_key()
       values << "(#{@user_id}, '#{license_key}', '#{product}', '#{expiration_date}')"
       generated_licenses << {
         license: license_key,

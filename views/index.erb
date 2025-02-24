@@ -89,8 +89,8 @@
         <h2>Welcome Back</h2>
         <form id="loginForm">
             <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
@@ -120,7 +120,7 @@
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            var username = document.getElementById('username').value;
+            var username = document.getElementById('email').value;
             var password = document.getElementById('password').value;
             var error = document.getElementById('error');
 

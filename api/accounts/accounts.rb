@@ -61,6 +61,23 @@ class Accounts
     end
   end
 
+  def get_info(token)
+    token_exists = db.execute('SELECT 1 FROM Authentication WHERE cookie = ?', [token]).any?
+    if token_exists
+      payload = @cookies.decode_cookie(token)
+      status = @cookies.check_expiration(payload)
+      if status == :EXPIRED || status == :INVALID
+        db.execute('UPDATE Authentication SET cookie = NULL WHERE cookie = ?', [token])
+        return 0
+      end
+      result = db.execute("SELECT role, credits, username, email FROM Authentication WHERE cookie = ?", [token])
+
+      return result[0]
+    else
+      return 0
+    end
+  end
+
   # Changes the user's password using a valid authentication cookie.
   # @param [String] cookie The user's authentication cookie.
   # @param [String] new_password The new password for the user.

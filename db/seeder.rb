@@ -1,5 +1,5 @@
 require 'sqlite3'
-
+require_relative '../api/security/sha'
 # Seeder class for initializing and populating the database with tables and data.
 class Seeder
 
@@ -26,6 +26,8 @@ class Seeder
                 email TEXT NOT NULL,
                 username TEXT NOT NULL,
                 password TEXT NOT NULL,
+                credits INTEGER DEFAULT 0,
+                role INTEGER DEFAULT 1,
                 last_login DATETIME,
                 cookie TEXT)')
     db.execute('CREATE TABLE Licenses (
@@ -39,8 +41,10 @@ class Seeder
   # Populates the 'Authentication' and 'Licenses' tables with initial data.
   # @return [void]
   def self.populate_tables
-    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("https.kiko@gmail.com", "pinkflamingo", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", CURRENT_TIMESTAMP)')
-    db.execute('INSERT INTO Licenses (owner, license, product, expiration) VALUES (1, "6504-26E6-E913-AAE7", "TEST", CURRENT_TIMESTAMP)')
+    
+    sha = SHA.new
+    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("christian@gmail.com", "hayz", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Licenses (owner, license, product, expiration) VALUES (1, "6504-26E6-E913-AAE7", "TEST", "2026-02-03")')
   end
 
   private

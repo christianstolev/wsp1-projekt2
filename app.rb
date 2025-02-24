@@ -99,10 +99,11 @@ class App < Sinatra::Base
   # @param [Integer] id The ID of the account for license generation.
   # @param [String] optional Optional parameter used in license generation.
   # @return [Redirect] Redirects to the home page.
-  get '/action/:action/:id/:optional' do
+  get '/action/:action/:id/:optional/:exp' do
     acc = Accounts.new
     action = params[:action]
     id = params[:id]
+    exp = params[:exp]
     case action
     when "generate" then
       if request.cookies["THOMASCOOKIE"] then
@@ -110,11 +111,36 @@ class App < Sinatra::Base
         auth_res = acc.auth_token(THOMASCOOKIE)
         if auth_res == :VALID then
           licenses = Licenses.new(THOMASCOOKIE)
-          licenses.generate_licenses(params[:optional], params[:id].to_i)
+          licenses.generate_licenses(params[:optional], params[:id].to_i, exp)
         end
       end
     end
     redirect '/'
+  end
+
+  get '/licenses' do
+    sha = SHA.new
+    cookies = Cookies.new
+    acc = Accounts.new
+
+    if params["register"] then
+      return erb :register
+    end
+
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+
+      if auth_res == :VALID then
+        licenses = Licenses.new(THOMASCOOKIE)
+        @licenses = licenses.get_licenses
+        @user_info = acc.get_info(THOMASCOOKIE)
+        return erb :licenses
+      elsif auth_res == :EXPIRED then
+        # Handle expired token if needed
+      end
+    end
+    erb :index
   end
 
   # Displays the homepage or user dashboard depending on authentication status.
@@ -136,7 +162,8 @@ class App < Sinatra::Base
       if auth_res == :VALID then
         licenses = Licenses.new(THOMASCOOKIE)
         @licenses = licenses.get_licenses
-        return erb :dashboard
+        @user_info = acc.get_info(THOMASCOOKIE)
+        return erb :indexv2
       elsif auth_res == :EXPIRED then
         # Handle expired token if needed
       end
