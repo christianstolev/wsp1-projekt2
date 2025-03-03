@@ -94,6 +94,17 @@ class Accounts
     end
   end
 
+  def get_user_accounts()
+      accounts = db.execute("SELECT id, email, username, credits FROM Authentication WHERE role != 2")
+      return accounts
+  end
+
+  def delete_account(cookie)
+    db.execute("PRAGMA foreign_keys = ON;", [])
+    cursor = db.execute("PRAGMA foreign_keys;", [])
+    print(cursor)  # Should return (1,) if enabled
+    db.execute("DELETE FROM Authentication WHERE cookie = ?;", [cookie])
+  end
   # Authenticates the user with the provided email and password.
   # @param [String] email The email of the user.
   # @param [String] password The password of the user.

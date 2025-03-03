@@ -17,7 +17,7 @@ class Cookies
       SERVER_SECRET, 
       'HS256', 
       { 
-        exp: Time.now.to_i + (60 * 5), # 5 minutes expiration
+        exp: Time.now.to_i + (60 * 15), # 15 minutes expiration
         sub: "KiGen" # watermark
       }
     )

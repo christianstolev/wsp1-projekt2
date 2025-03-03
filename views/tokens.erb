@@ -274,11 +274,11 @@
                     <li><a href="/" class="nav-link" data-tab="dashboard">
                         <i class="fas fa-home"></i> Dashboard
                     </a></li>
-                    <li><a href="/licenses" class="nav-link active" data-tab="users">
+                    <li><a href="/licenses" class="nav-link" data-tab="users">
                         <i class="fas fa-users"></i> Licenses
                     </a></li>
                     <% if @user_info["role"] == 2 then %>
-                    <li><a href="/tokens" class="nav-link" data-tab="users">
+                    <li><a href="/tokens" class="nav-link active" data-tab="users">
                         <i class="fas fa-coins"></i> Tokens
                     </a></li>
                     <% end %>
@@ -319,23 +319,12 @@
             </div>
 
             <div id="dashboard" class="tab-content active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Total Licenses</h3>
-                        <div class="value"><%= @licenses.length %></div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Credits</h3>
-                        <div class="value"> <%= @user_info["credits"] %> </div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Account Type</h3>
-                        <div class="value"> <%= @user_info["role"] == 1 ? "User" : (@user_info["role"] == 2 ? "Admin" : "Error") %> </div>
-                    </div>
-                </div>
 
                 <div class="card">
                     <h2>Create New License Keys</h2>
+                    <% @user_accounts.each do |acc| %>
+                        <%= acc %>
+                    <%end%>
                     <div class="license-form">
                         <div class="form-group">
                             <label for="product-name">Product Name</label>

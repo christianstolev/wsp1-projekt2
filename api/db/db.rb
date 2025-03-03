@@ -15,7 +15,7 @@ class Database
   # @param [String] query The SQL query to execute.
   # @param [Array] args The arguments to bind to the query.
   # @return [Array] The result of the query.
-  def execute(query, args)
+  def execute(query, args=[])
     @db.execute(query, args)
   end
 

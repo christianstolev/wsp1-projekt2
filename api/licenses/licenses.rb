@@ -4,7 +4,7 @@ require_relative '../accounts/accounts'
 require 'securerandom'
 
 class Licenses
-  attr_reader :user_id, :db
+  attr_reader :user_id, :db, :token
 
   # Initializes the Licenses class with a user token.
   # @param [String] token The authentication token.
@@ -12,7 +12,7 @@ class Licenses
   def initialize(token)
     @db = Database.new
     acc = Accounts.new
-
+    @token = token
     if acc.auth_token(token) == :VALID then
       @user_id = db.execute('SELECT id FROM Authentication WHERE cookie = ?', [token]).first['id']
       print("[LICENSE_MANAGER] User ID has been set to #{@user_id}\n")
@@ -65,6 +65,14 @@ class Licenses
   def generate_licenses(product, amount, expiration_date)
     return nil unless @user_id
 
+    acc = Accounts.new
+    if acc.auth_token(@token) == :VALID then
+      user_info = acc.get_info(@token)
+      if not (user_info['credits'] >= amount) then
+        return 
+      end
+    end
+
     values = []
     generated_licenses = []
     if not expiration_date then
@@ -93,6 +101,9 @@ class Licenses
 
     query = "INSERT INTO Licenses (owner, license, product, expiration) VALUES #{values.join(', ')}"
     @db.execute(query, [])
+
+    user_info = acc.get_info(@token)
+    @db.execute("UPDATE Authentication SET credits = ? WHERE cookie = ?", [user_info["credits"] - amount, @token])
 
     print("[LICENSE_MANAGER] Generated #{amount} licenses for product '#{product}'.\n")
     return generated_licenses

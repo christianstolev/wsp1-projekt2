@@ -21,6 +21,7 @@ class Seeder
   # Creates the 'Authentication' and 'Licenses' tables in the database.
   # @return [void]
   def self.create_tables
+    db.execute("PRAGMA foreign_keys = ON;")
     db.execute('CREATE TABLE Authentication (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL,
@@ -35,7 +36,9 @@ class Seeder
                 owner INTEGER NOT NULL,
                 license TEXT NOT NULL,
                 product TEXT NOT NULL,
-                expiration DATETIME)')
+                expiration DATETIME,
+                FOREIGN KEY (owner) REFERENCES Authentication(id) ON DELETE CASCADE
+                )')
   end
 
   # Populates the 'Authentication' and 'Licenses' tables with initial data.
@@ -43,7 +46,11 @@ class Seeder
   def self.populate_tables
     
     sha = SHA.new
-    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("christian@gmail.com", "hayz", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Authentication (email, username, password, role, last_login) VALUES ("christian@gmail.com", "hayz", "' + sha.hash_str("password123") + '", 2, CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("231ersdfxc@gmail.com", "adlien", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("5q4yetg45qet54ge5@gmail.com", "13qeda", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("elliot@gmail.com", "elli9023", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
+    db.execute('INSERT INTO Authentication (email, username, password, last_login) VALUES ("aker@gmail.com", "eker", "' + sha.hash_str("password123") + '", CURRENT_TIMESTAMP)')
     db.execute('INSERT INTO Licenses (owner, license, product, expiration) VALUES (1, "6504-26E6-E913-AAE7", "TEST", "2026-02-03")')
   end
 

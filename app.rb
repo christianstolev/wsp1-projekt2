@@ -59,6 +59,15 @@ class App < Sinatra::Base
     redirect '/'
   end
 
+  get '/terminate_account' do
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      acc = Accounts.new
+      acc.delete_account(THOMASCOOKIE)
+    end
+    redirect '/'
+  end
+
   # Performs actions like delete or change based on URL parameters.
   # @route GET /action/:action/:id
   # @param [String] action The action to perform ('delete' or 'change').
@@ -79,6 +88,7 @@ class App < Sinatra::Base
         if auth_res == :VALID then
           licenses = Licenses.new(THOMASCOOKIE)
           licenses.delete_license(id)
+          redirect '/licenses'
         end
       end
     when "change" then
@@ -143,6 +153,28 @@ class App < Sinatra::Base
     erb :index
   end
 
+  get '/tokens' do
+    sha = SHA.new
+    cookies = Cookies.new
+    acc = Accounts.new
+    puts "hiii"
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      puts auth_res
+      if auth_res == :VALID then
+        user_accounts = acc.get_user_accounts()
+        @user_accounts = user_accounts
+        @user_info = acc.get_info(THOMASCOOKIE)
+        return erb :tokens
+      else
+        puts "auth not valid"
+      end
+    else
+      puts "no cookie :("
+    end
+    puts "ded"
+  end
   # Displays the homepage or user dashboard depending on authentication status.
   # @route GET /
   # @return [String] HTML content for the homepage or user dashboard.
