@@ -78,6 +78,44 @@ class Accounts
     end
   end
 
+  def add_credits(token, id, amount)
+    token_exists = db.execute('SELECT 1 FROM Authentication WHERE cookie = ?', [token]).any?
+    if token_exists
+      payload = @cookies.decode_cookie(token)
+      status = @cookies.check_expiration(payload)
+      if status == :EXPIRED || status == :INVALID
+        db.execute('UPDATE Authentication SET cookie = NULL WHERE cookie = ?', [token])
+        return 0
+      end
+      result = db.execute("SELECT role, credits, username, email FROM Authentication WHERE id = ?", [id])
+      credits = result[0]["credits"]
+      new_credits = credits + amount
+      db.execute('UPDATE Authentication SET credits = ?, last_login = CURRENT_TIMESTAMP WHERE id = ?', [new_credits, id])
+      return result[0]
+    else
+      return 0
+    end
+  end
+
+  def remove_credits(token, id, amount)
+    token_exists = db.execute('SELECT 1 FROM Authentication WHERE cookie = ?', [token]).any?
+    if token_exists
+      payload = @cookies.decode_cookie(token)
+      status = @cookies.check_expiration(payload)
+      if status == :EXPIRED || status == :INVALID
+        db.execute('UPDATE Authentication SET cookie = NULL WHERE cookie = ?', [token])
+        return 0
+      end
+      result = db.execute("SELECT role, credits, username, email FROM Authentication WHERE id = ?", [id])
+      credits = result[0]["credits"]
+      new_credits = credits - amount
+      db.execute('UPDATE Authentication SET credits = ?, last_login = CURRENT_TIMESTAMP WHERE id = ?', [new_credits, id])
+      return result[0]
+    else
+      return 0
+    end
+  end
+
   # Changes the user's password using a valid authentication cookie.
   # @param [String] cookie The user's authentication cookie.
   # @param [String] new_password The new password for the user.
@@ -98,6 +136,36 @@ class Accounts
       accounts = db.execute("SELECT id, email, username, credits FROM Authentication WHERE role != 2")
       return accounts
   end
+
+  def join_group(cookie, group_id)
+      token_exists = db.execute('SELECT id FROM Authentication WHERE cookie = ?', [cookie]).first
+      if token_exists
+        userid = token_exists['id']
+        db.execute('INSERT OR IGNORE INTO UserGroups (user_id, group_id) VALUES (?, ?)', [userid, group_id])
+      end
+  end
+
+  def leave_group(cookie, group_id)
+    token_exists = db.execute('SELECT id FROM Authentication WHERE cookie = ?', [cookie]).first
+    if token_exists
+      userid = token_exists['id']
+      db.execute('DELETE FROM UserGroups WHERE user_id = ? AND group_id = ?', [userid, group_id])
+    end
+  end
+
+  def get_user_groups(cookie)
+    token_exists = db.execute('SELECT id FROM Authentication WHERE cookie = ?', [cookie]).first
+    return [] unless token_exists
+  
+    userid = token_exists['id']
+    groups = db.execute('SELECT id, name FROM Groups')
+    user_groups = db.execute('SELECT group_id FROM UserGroups WHERE user_id = ?', [userid]).map { |row| row['group_id'] }
+  
+    groups.map do |group|
+      member_count = db.execute('SELECT COUNT(*) as count FROM UserGroups WHERE group_id = ?', [group['id']]).first['count']
+      { id: group['id'], name: group['name'], joined: user_groups.include?(group['id']), members: member_count }
+    end
+  end  
 
   def delete_account(cookie)
     db.execute("PRAGMA foreign_keys = ON;", [])

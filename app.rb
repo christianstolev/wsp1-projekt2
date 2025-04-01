@@ -3,6 +3,14 @@ require_relative './api/security/cookies'
 require_relative './api/accounts/accounts'
 require_relative './api/licenses/licenses'
 
+require 'rack/attack'
+
+use Rack::Attack
+
+Rack::Attack.throttle('req/ip', limit: 5, period: 1) do |req|
+  req.ip # Throttle requests based on IP address
+end
+
 # Main application class handling various routes and actions.
 class App < Sinatra::Base
 
@@ -24,6 +32,24 @@ class App < Sinatra::Base
     redirect '/'
   end
 
+
+  post '/licenses/generate' do
+    acc = Accounts.new
+
+    amount = params[:amount].to_i
+    product = params[:product]
+    expiration = params[:expiration]
+
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      if auth_res == :VALID then
+        licenses = Licenses.new(THOMASCOOKIE)
+        licenses.generate_licenses(product, amount, expiration)
+        redirect request.path
+      end
+    end
+  end
   # Handles user registration.
   # @route POST /register
   # @param [String] email User's email.
@@ -68,64 +94,62 @@ class App < Sinatra::Base
     redirect '/'
   end
 
-  # Performs actions like delete or change based on URL parameters.
-  # @route GET /action/:action/:id
-  # @param [String] action The action to perform ('delete' or 'change').
-  # @param [Integer] id The ID of the account to modify.
-  # @return [String] Confirmation message or redirect.
-  get '/action/:action/:id' do
+  get '/credits/add/:id/:amount' do
     acc = Accounts.new
-    action = params[:action]
-    id = params[:id]
+    amount = params[:amount].to_i
+    id = params[:id].to_i
 
-    p action
-    case action
-    when "delete" then
-      "Delete #{id} from db"
-      if request.cookies["THOMASCOOKIE"] then
-        THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
-        auth_res = acc.auth_token(THOMASCOOKIE)
-        if auth_res == :VALID then
-          licenses = Licenses.new(THOMASCOOKIE)
-          licenses.delete_license(id)
-          redirect '/licenses'
-        end
-      end
-    when "change" then
-      if request.cookies["THOMASCOOKIE"] then
-        THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
-        auth_res = acc.auth_token(THOMASCOOKIE)
-        if auth_res == :VALID then
-          acc.change_password_by_cookie(THOMASCOOKIE, id)
-        end
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      if auth_res == :VALID then
+        acc.add_credits(THOMASCOOKIE, id, amount)
+        redirect '/tokens'
       end
     end
-    redirect '/'
   end
 
-  # Generates licenses based on provided parameters.
-  # @route GET /action/:action/:id/:optional
-  # @param [String] action The action to perform ('generate').
-  # @param [Integer] id The ID of the account for license generation.
-  # @param [String] optional Optional parameter used in license generation.
-  # @return [Redirect] Redirects to the home page.
-  get '/action/:action/:id/:optional/:exp' do
+  get '/credits/remove/:id/:amount' do
     acc = Accounts.new
-    action = params[:action]
-    id = params[:id]
-    exp = params[:exp]
-    case action
-    when "generate" then
-      if request.cookies["THOMASCOOKIE"] then
-        THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
-        auth_res = acc.auth_token(THOMASCOOKIE)
-        if auth_res == :VALID then
-          licenses = Licenses.new(THOMASCOOKIE)
-          licenses.generate_licenses(params[:optional], params[:id].to_i, exp)
-        end
+    amount = params[:amount].to_i
+    id = params[:id].to_i
+
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      if auth_res == :VALID then
+        acc.remove_credits(THOMASCOOKIE, id, amount)
+        redirect '/tokens'
       end
     end
-    redirect '/'
+  end
+
+  get '/licenses/:id/delete' do
+    acc = Accounts.new
+    id = params[:id]
+
+    "Delete #{id} from db"
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      if auth_res == :VALID then
+        licenses = Licenses.new(THOMASCOOKIE)
+        licenses.delete_license(id)
+        redirect '/licenses'
+      end
+    end
+  end
+
+  get '/accounts/:id/change_passwords' do
+    acc = Accounts.new
+    id = params[:id]
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      if auth_res == :VALID then
+        acc.change_password_by_cookie(THOMASCOOKIE, id)
+      end
+    end
   end
 
   get '/licenses' do
@@ -145,7 +169,7 @@ class App < Sinatra::Base
         licenses = Licenses.new(THOMASCOOKIE)
         @licenses = licenses.get_licenses
         @user_info = acc.get_info(THOMASCOOKIE)
-        return erb :licenses
+        return erb :"licenses/index"
       elsif auth_res == :EXPIRED then
         # Handle expired token if needed
       end
@@ -166,7 +190,67 @@ class App < Sinatra::Base
         user_accounts = acc.get_user_accounts()
         @user_accounts = user_accounts
         @user_info = acc.get_info(THOMASCOOKIE)
-        return erb :tokens
+        return erb :"tokens/index"
+      else
+        puts "auth not valid"
+      end
+    else
+      puts "no cookie :("
+    end
+    puts "ded"
+  end
+
+  get '/groups/:id/join' do
+    sha = SHA.new
+    cookies = Cookies.new
+    acc = Accounts.new
+
+    group_id = params[:id]
+
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      puts auth_res
+      if auth_res == :VALID then
+        acc.join_group(THOMASCOOKIE, group_id)
+        redirect '/groups'
+      end
+    end
+  end
+
+  
+  get '/groups/:id/leave' do
+    sha = SHA.new
+    cookies = Cookies.new
+    acc = Accounts.new
+
+    group_id = params[:id]
+
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      puts auth_res
+      if auth_res == :VALID then
+        acc.leave_group(THOMASCOOKIE, group_id)
+        redirect '/groups'
+      end
+    end
+  end
+  
+  get '/groups' do
+    sha = SHA.new
+    cookies = Cookies.new
+    acc = Accounts.new
+    puts "hiii"
+    if request.cookies["THOMASCOOKIE"] then
+      THOMASCOOKIE = request.cookies["THOMASCOOKIE"]
+      auth_res = acc.auth_token(THOMASCOOKIE)
+      puts auth_res
+      if auth_res == :VALID then
+        @user_info = acc.get_info(THOMASCOOKIE)
+        @groups = acc.get_user_groups(THOMASCOOKIE)
+        p @groups.inspect
+        return erb :"groups/index"
       else
         puts "auth not valid"
       end
@@ -195,7 +279,7 @@ class App < Sinatra::Base
         licenses = Licenses.new(THOMASCOOKIE)
         @licenses = licenses.get_licenses
         @user_info = acc.get_info(THOMASCOOKIE)
-        return erb :indexv2
+        return erb :"dashboard/index"
       elsif auth_res == :EXPIRED then
         # Handle expired token if needed
       end

@@ -372,7 +372,7 @@
                                 <td><%= license["license"] %></td>
                                 <td><%= license["product"] %></td>
                                 <td><%= license["expiration"] %></td>
-                                <td><a href="/action/delete/<%= license["id"] %>">Delete</a>
+                                <td><a href="/licenses/<%= license["id"] %>/delete">Delete</a>
                                 <td>
                             </tr>
                             <% end %>
@@ -432,8 +432,21 @@
                 alert("Not enough credits.")
                 return
             }
-            window.location.href = `/action/generate/${amount}/${productName}/${expiration}`;
-        })
+            // licenses/generate/
+            //window.location.href = `/action/generate/${amount}/${productName}/${expiration}`;
+
+            const formData = new FormData();
+                formData.append('amount', amount);
+                formData.append('product', productName);
+                formData.append('expiration', expiration);
+                fetch('/licenses/generate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            })
     </script>
 </body>
 </html>

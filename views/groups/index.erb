@@ -294,7 +294,7 @@
 
         <main class="main-content">
             <div class="top-bar">
-                <h1>Licenses</h1>
+                <h1>Groups</h1>
                 <div class="user-menu">
                     <button class="user-button">
                         <i class="fas fa-user-circle"></i>
@@ -319,57 +319,35 @@
             </div>
 
             <div id="dashboard" class="tab-content active">
-
-                <div class="card">
-                    <h2>Create New License Keys</h2>
-                    <% @user_accounts.each do |acc| %>
-                        <%= acc %>
-                    <%end%>
-                    <div class="license-form">
-                        <div class="form-group">
-                            <label for="product-name">Product Name</label>
-                            <input type="text" id="product-name" name="product-name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="amount">Amount: <span id="amount-value">50</span></label>
-                            <input type="range" id="amount" name="amount" min="1" max="100" value="50" class="form-range">
-                        </div>
-                        <div class="form-group">
-                            <label for="expiration">Expiration Date</label>
-                            <input type="date" id="expiration" name="expiration" class="form-input" required>
-                        </div>
-                        <button type="submit" id="submit-button" class="submit-button">Generate License Keys</button>
-                    </div>
-                </div>
-
                 <div class="card">
                     <h2>License Keys</h2>
                     <table>
                         <thead>
                             <tr>
-                                <th>License Key</th>
-                                <th>Product</th>
-                                <th>Expiration Time</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Members</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Sample data, replace with dynamic data in a real application -->
-                            <% if @licenses && @licenses.any? %>
-                            <% @licenses.each do |license| %>
-                            <tr>
-                                <td><%= license["license"] %></td>
-                                <td><%= license["product"] %></td>
-                                <td><%= license["expiration"] %></td>
-                                <td><a href="/action/delete/<%= license["id"] %>">Delete</a>
-                                <td>
-                            </tr>
-                            <% end %>
-                            <% else %>
-                            <tr>
-                                <td colspan="3">No licenses found.</td>
-                            </tr>
-                            <% end %>
+                            <% @groups.each do |acc| %>
+                                <tr>
+                                    <td><%= acc[:id] %></td>
+                                    <td><%= acc[:name] %></td>
+                                    <td><%= acc[:members] %></td>
+                                    <td>
+                                        <% if acc[:joined] then %>
+                                            <button onclick="window.location.href = '/groups/<%= acc[:id] %>/leave'">Leave</button>
+                                        <% else %>
+                                            <button onclick="window.location.href = '/groups/<%= acc[:id] %>/join'">Join</button>
+                                        <% end %>
+                                    </td>
+                                    <td>
+                                </tr>
+                            <%end%>
+                           
                         </tbody>
                     </table>
                 </div>
@@ -378,6 +356,17 @@
     </div>
 
     <script>
+    function add_credits(id)
+    {
+        let amount = prompt("Amount to add:")
+        window.location.href = "/credits/add/" + id + "/" + amount
+    }
+
+    function remove_credits(id)
+    {
+        let amount = prompt("Amount to remove:")
+        window.location.href = "/credits/remove/" + id + "/" + amount
+    }
         // User menu toggle
         const userButton = document.querySelector('.user-button');
         const userMenu = document.querySelector('.user-menu-dropdown');
